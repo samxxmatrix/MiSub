@@ -182,7 +182,7 @@ const updateOperatorParams = (index, params) => {
     <div v-else class="space-y-2">
       <div v-for="(op, index) in modelValue" :key="op.id || index" 
         :class="[
-            'group overflow-hidden rounded-2xl border bg-white transition-all dark:bg-gray-800',
+            'overflow-hidden rounded-2xl border bg-white transition-all dark:bg-gray-800',
             expandedIndex === index ? 'border-indigo-500/50 ring-4 ring-indigo-500/5 shadow-xl' : 'border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
             !op.enabled && 'opacity-60 grayscale-[0.5]'
         ]">
@@ -212,7 +212,7 @@ const updateOperatorParams = (index, params) => {
            </div>
            
            <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1.5 pr-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+            <div class="flex items-center gap-1.5 pr-2">
                 <button @click="(e) => moveOperator(e, index, -1)" class="rounded-md p-1 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 dark:hover:bg-indigo-500/10" :disabled="index === 0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
                 </button>
