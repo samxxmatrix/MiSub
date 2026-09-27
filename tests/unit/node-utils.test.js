@@ -57,8 +57,8 @@ describe('node-utils', () => {
 
         const stripped = removeFlagEmoji(withEmoji);
         expect(stripped).not.toBe(withEmoji);
-        expect(index.get(withEmoji)).toBe('机场A');
-        expect(index.get(stripped)).toBe('机场A');
+        expect(index.get(withEmoji)).toEqual({ subName: '机场A' });
+        expect(index.get(stripped)).toEqual({ subName: '机场A' });
     });
 
     it('indexSubNameByUrl 普通 URL 只记录原始形态', () => {
@@ -66,7 +66,7 @@ describe('node-utils', () => {
         const index = new Map();
         indexSubNameByUrl([url], '机场B', index);
 
-        expect(index.get(url)).toBe('机场B');
+        expect(index.get(url)).toEqual({ subName: '机场B' });
     });
 
     it('buildNodeMetadataByUrl 提取自定义分组与来源订阅名', () => {
