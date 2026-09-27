@@ -255,16 +255,18 @@ export function removeFlagEmoji(link) {
 
 /**
  * 将节点的来源订阅名按 URL 建立索引（同时记录去国旗 emoji 后的形态，
- * 因为外层在 emoji 关闭时会移除国旗 emoji，URL 会变化，需保证汇聚后仍能匹配）
+ * 因为外层在 emoji 关闭时会移除国旗 emoji，URL 会变化，需保证汇聚后仍能匹配）。
+ * 值为对象 { subName }，与 runOperatorChain 的 metadata 展开协议一致（展开后 record.subName 可用）。
  * @param {string[]} nodeUrls - 最终节点 URL 列表
  * @param {string} subName - 来源订阅名
- * @param {Map<string, string>} index - URL -> 订阅名 索引
+ * @param {Map<string, {subName: string}>} index - URL -> 元数据 索引
  */
 export function indexSubNameByUrl(nodeUrls, subName, index) {
+    const meta = { subName };
     for (const nodeUrl of nodeUrls) {
-        index.set(nodeUrl, subName);
+        index.set(nodeUrl, meta);
         const strippedUrl = removeFlagEmoji(nodeUrl);
-        if (strippedUrl !== nodeUrl) index.set(strippedUrl, subName);
+        if (strippedUrl !== nodeUrl) index.set(strippedUrl, meta);
     }
 }
 
