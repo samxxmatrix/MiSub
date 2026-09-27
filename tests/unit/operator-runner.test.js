@@ -122,7 +122,7 @@ describe('operator runner', () => {
     expect(decodeURIComponent(result[0])).toContain('#香港|机场A|线路B');
   });
 
-  it('exposes subscription name as {sub} in rename templates', async () => {
+  it('exposes source subscription name as {sub} in rename templates', async () => {
     const urls = [
       'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
     ];
@@ -136,12 +136,56 @@ describe('operator runner', () => {
           }
         }
       }
-    ], { subName: '机场A' });
+    ], {
+      subName: '订阅组A',
+      nodeMetadataByUrl: new Map([[urls[0], { subName: '机场A' }]])
+    });
 
     expect(decodeURIComponent(result[0])).toContain('#机场A example.com:8388');
   });
 
-  it('exposes subscription name as {sub} in rename regex replacements', async () => {
+  it('exposes subscription group name as {mysub} in rename templates', async () => {
+    const urls = [
+      'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
+    ];
+    const result = await runOperatorChain(urls, [
+      {
+        type: 'rename',
+        params: {
+          template: {
+            enabled: true,
+            template: '{mysub} {server}:{port}'
+          }
+        }
+      }
+    ], {
+      subName: '订阅组A',
+      nodeMetadataByUrl: new Map([[urls[0], { subName: '机场A' }]])
+    });
+
+    expect(decodeURIComponent(result[0])).toContain('#订阅组A example.com:8388');
+  });
+
+  it('falls back to group name for {sub} when source metadata is absent', async () => {
+    const urls = [
+      'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
+    ];
+    const result = await runOperatorChain(urls, [
+      {
+        type: 'rename',
+        params: {
+          template: {
+            enabled: true,
+            template: '{sub} {server}:{port}'
+          }
+        }
+      }
+    ], { subName: '订阅组A' });
+
+    expect(decodeURIComponent(result[0])).toContain('#订阅组A example.com:8388');
+  });
+
+  it('exposes source subscription name as {sub} in rename regex replacements', async () => {
     const urls = [
       'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
     ];
@@ -155,7 +199,10 @@ describe('operator runner', () => {
           }
         }
       }
-    ], { subName: '机场A' });
+    ], {
+      subName: '订阅组A',
+      nodeMetadataByUrl: new Map([[urls[0], { subName: '机场A' }]])
+    });
 
     expect(decodeURIComponent(result[0])).toContain('#机场A example.com:8388');
   });

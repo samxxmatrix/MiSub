@@ -52,18 +52,18 @@ describe('rename editor', () => {
     expect(last.template.template).toBe('{server}:{port}');
   });
 
-  it('shows hover tooltips on variable buttons including {port} and {sub}', () => {
+  it('shows hover tooltips on variable buttons including {sub} and {mysub}', () => {
     const wrapper = mountEditor({ template: { enabled: true, template: '', offset: 1 } });
 
-    const serverBtn = findButtonByText(wrapper, '{server}');
     const portBtn = findButtonByText(wrapper, '{port}');
     const subBtn = findButtonByText(wrapper, '{sub}');
+    const mysubBtn = findButtonByText(wrapper, '{mysub}');
 
-    expect(serverBtn).toBeTruthy();
     expect(portBtn).toBeTruthy();
     expect(subBtn).toBeTruthy();
-    expect(serverBtn.attributes('title')).toBeTruthy();
+    expect(mysubBtn).toBeTruthy();
     expect(portBtn.attributes('title')).toBeTruthy();
-    expect(subBtn.attributes('title')).toBeTruthy();
+    expect(subBtn.attributes('title')).toBe('Airport subscription name');
+    expect(mysubBtn.attributes('title')).toBe('Subscription group name');
   });
 });
