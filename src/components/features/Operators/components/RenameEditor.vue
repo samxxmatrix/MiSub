@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from '../../../../i18n/index.js';
 
 const props = defineProps({
@@ -22,6 +22,9 @@ const updateTemplate = (updates) => {
   const current = props.modelValue.template || { enabled: false, template: '', offset: 1 };
   updateParam('template', { ...current, ...updates });
 };
+
+// “常用正则”下拉菜单的展开状态（点击切换，非悬停）
+const showRegexPresets = ref(false);
 
 const addRule = () => {
   const current = { ...(props.modelValue.regex || { enabled: true, rules: [] }) };
@@ -51,6 +54,24 @@ const presetTemplates = [
   { nameKey: 'operators.templatePresetRegex', template: '{emoji}{g1}-{g2}-{index:2}' },
   { nameKey: 'operators.templatePresetSimple', template: '{emoji}{regionZh} {index:2}' },
   { nameKey: 'operators.templatePresetName', template: '{name}' },
+  { nameKey: 'operators.templatePresetServer', template: '{server}:{port}' },
+];
+
+// 模板可用变量及其悬停说明（title 提示）
+const variableTags = [
+  { tag: '{name}', hintKey: 'operators.varName' },
+  { tag: '{protocol}', hintKey: 'operators.varProtocol' },
+  { tag: '{regionZh}', hintKey: 'operators.varRegionZh' },
+  { tag: '{region}', hintKey: 'operators.varRegion' },
+  { tag: '{emoji}', hintKey: 'operators.varEmoji' },
+  { tag: '{index}', hintKey: 'operators.varIndex' },
+  { tag: '{index:2}', hintKey: 'operators.varIndexPad' },
+  { tag: '{g1}', hintKey: 'operators.varG1' },
+  { tag: '{g2}', hintKey: 'operators.varG2' },
+  { tag: '{g3}', hintKey: 'operators.varG3' },
+  { tag: '{server}', hintKey: 'operators.varServer' },
+  { tag: '{port}', hintKey: 'operators.varPort' },
+  { tag: '{sub}', hintKey: 'operators.varSub' }
 ];
 
 const applyPresetTemplate = (tpl) => {
@@ -81,13 +102,17 @@ const applyPresetRegex = (rule) => {
       <div class="flex items-center justify-between">
         <label class="text-[11px] font-bold text-gray-400 uppercase tracking-tight">{{ t('operators.regexReplace') }}</label>
           <div class="flex items-center gap-2">
-            <div class="relative group/presets">
-              <button class="text-[10px] text-gray-400 font-medium hover:text-indigo-600 transition-colors flex items-center gap-0.5">
+            <div class="relative">
+              <button
+                @click="showRegexPresets = !showRegexPresets"
+                class="text-[10px] text-gray-400 font-medium hover:text-indigo-600 transition-colors flex items-center gap-0.5"
+              >
                 {{ t('operators.commonRegex') }}
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
               </button>
-              <div class="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover/presets:opacity-100 group-hover/presets:visible transition-all z-10 py-1">
-                <button v-for="rule in presetRegexRules" :key="rule.nameKey" @click="applyPresetRegex(rule)"
+              <div v-if="showRegexPresets" class="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg shadow-xl z-10 py-1">
+                <button v-for="rule in presetRegexRules" :key="rule.nameKey"
+                  @click="applyPresetRegex(rule); showRegexPresets = false"
                   class="w-full text-left px-3 py-1.5 text-[10px] hover:bg-gray-50 dark:hover:bg-gray-700/50 dark:text-gray-300 transition-colors">
                   {{ t(rule.nameKey) }}
                 </button>
@@ -163,11 +188,12 @@ const applyPresetRegex = (rule) => {
               class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-gray-800 border border-teal-100/50 dark:border-teal-900/30 outline-none focus:ring-2 focus:ring-teal-500/10"
             />
             <div class="flex flex-wrap gap-1.5">
-              <button v-for="tag in ['{name}', '{protocol}', '{regionZh}', '{region}', '{emoji}', '{index}', '{index:2}', '{g1}', '{g2}', '{g3}', '{server}']" :key="tag"
+              <button v-for="item in variableTags" :key="item.tag"
                 class="text-[9px] bg-white dark:bg-gray-800 text-teal-600 px-1.5 py-0.5 rounded border border-teal-100/30 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
-                @click="updateTemplate({ template: (props.modelValue.template.template || '') + tag })"
+                :title="t(item.hintKey)"
+                @click="updateTemplate({ template: (props.modelValue.template.template || '') + item.tag })"
               >
-                {{ tag }}
+                {{ item.tag }}
               </button>
             </div>
             <div class="flex items-center gap-2 mt-1">
