@@ -84,7 +84,7 @@ function opFilter(nodes, params) {
 /**
  * Rename Operator
  */
-function opRename(nodes, params) {
+function opRename(nodes, params, context = {}) {
     if (!params) return nodes;
     const { regex, template } = params;
     let result = [...nodes];
@@ -101,7 +101,8 @@ function opRename(nodes, params) {
                     regionZh: enriched.regionZh,
                     emoji: enriched.emoji,
                     server: r.server,
-                    port: r.port
+                    port: r.port,
+                    sub: context?.subName || ''
                 };
 
                 // 核心增强：允许在正则替换中使用 {regionZh} 等变量
@@ -149,6 +150,7 @@ function opRename(nodes, params) {
                 emoji: enriched.emoji,
                 server: r.server,
                 port: r.port,
+                sub: context?.subName || '',
                 index: groupIndex + (Number(template.offset || template.indexStart) || 1) - 1,
                 globalIndex: index + (Number(template.offset || template.indexStart) || 1)
             };
@@ -257,7 +259,7 @@ export async function runOperatorChain(nodeUrls, operators, context = {}) {
                 records = opFilter(records, params);
                 break;
             case 'rename':
-                records = opRename(records, params);
+                records = opRename(records, params, enrichedContext);
                 break;
             case 'script':
                 records = await opScript(records, params, enrichedContext);
