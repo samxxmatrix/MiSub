@@ -122,6 +122,44 @@ describe('operator runner', () => {
     expect(decodeURIComponent(result[0])).toContain('#香港|机场A|线路B');
   });
 
+  it('exposes subscription name as {sub} in rename templates', async () => {
+    const urls = [
+      'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
+    ];
+    const result = await runOperatorChain(urls, [
+      {
+        type: 'rename',
+        params: {
+          template: {
+            enabled: true,
+            template: '{sub} {server}:{port}'
+          }
+        }
+      }
+    ], { subName: '机场A' });
+
+    expect(decodeURIComponent(result[0])).toContain('#机场A example.com:8388');
+  });
+
+  it('exposes subscription name as {sub} in rename regex replacements', async () => {
+    const urls = [
+      'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode'
+    ];
+    const result = await runOperatorChain(urls, [
+      {
+        type: 'rename',
+        params: {
+          regex: {
+            enabled: true,
+            rules: [{ pattern: '.*', replacement: '{sub} {server}:{port}', flags: 'gi' }]
+          }
+        }
+      }
+    ], { subName: '机场A' });
+
+    expect(decodeURIComponent(result[0])).toContain('#机场A example.com:8388');
+  });
+
   it('sorts nodes by custom group metadata', async () => {
     const urls = [
       'ss://YWVzLTEyOC1nY206cGFzcw@us.example.com:8388#USNode',
