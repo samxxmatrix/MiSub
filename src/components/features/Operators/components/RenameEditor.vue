@@ -71,7 +71,8 @@ const variableTags = [
   { tag: '{g3}', hintKey: 'operators.varG3' },
   { tag: '{server}', hintKey: 'operators.varServer' },
   { tag: '{port}', hintKey: 'operators.varPort' },
-  { tag: '{sub}', hintKey: 'operators.varSub' }
+  { tag: '{sub}', hintKey: 'operators.varSub' },
+  { tag: '{mysub}', hintKey: 'operators.varMysub' }
 ];
 
 const applyPresetTemplate = (tpl) => {
