@@ -102,7 +102,10 @@ function opRename(nodes, params, context = {}) {
                     emoji: enriched.emoji,
                     server: r.server,
                     port: r.port,
-                    sub: context?.subName || ''
+                    // 机场订阅名：优先取节点携带的来源订阅，缺失时回退订阅组名
+                    sub: r.subName || context?.subName || '',
+                    // 订阅组名：来自操作符链的 context
+                    mysub: context?.subName || ''
                 };
 
                 // 核心增强：允许在正则替换中使用 {regionZh} 等变量
@@ -150,7 +153,10 @@ function opRename(nodes, params, context = {}) {
                 emoji: enriched.emoji,
                 server: r.server,
                 port: r.port,
-                sub: context?.subName || '',
+                // 机场订阅名：优先取节点携带的来源订阅，缺失时回退订阅组名
+                sub: r.subName || context?.subName || '',
+                // 订阅组名：来自操作符链的 context
+                mysub: context?.subName || '',
                 index: groupIndex + (Number(template.offset || template.indexStart) || 1) - 1,
                 globalIndex: index + (Number(template.offset || template.indexStart) || 1)
             };

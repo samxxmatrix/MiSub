@@ -404,6 +404,8 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
     const httpSubs = misubs.filter(sub => sub && sub.url && sub.url.toLowerCase().startsWith('http'));
     const limiter = createConcurrencyLimiter(FETCH_CONFIG.CONCURRENCY);
     let upstreamSuccessCount = 0; // 追踪真正从远程拉取成功的订阅数（不含 per-sub 缓存回退）
+    // 记录每个节点 URL 的来源订阅名，供汇聚后的全局操作符链使用 {sub} 变量
+    const subNameByUrl = new Map();
 
     /**
      * 获取单个订阅内容
@@ -518,9 +520,12 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
             const shouldPrependSubscriptions = profilePrefixSettings?.enableSubscriptions ?? true;
             const shouldAddSubPrefix = shouldPrependSubscriptions && !skipPrefixDueToRenaming;
 
-            return (shouldAddSubPrefix && sub.name)
-                ? validNodes.map(node => prependNodeName(node, sub.name)).join('\n')
-                : validNodes.join('\n');
+            const finalNodes = (shouldAddSubPrefix && sub.name)
+                ? validNodes.map(node => prependNodeName(node, sub.name))
+                : validNodes;
+            // 记录最终节点 URL 的来源订阅名（含前缀后的最终形态，保证与汇聚后的行一致）
+            finalNodes.forEach(nodeUrl => subNameByUrl.set(nodeUrl, sub.name || ''));
+            return finalNodes.join('\n');
         } catch (e) {
             recordEmptyRuntimeInfo();
             return (await readCachedNodes()).join('\n');
@@ -567,6 +572,7 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
     if (activeOperators.length > 0) {
         currentLines = await runOperatorChain(currentLines, activeOperators, {
             subName: profilePrefixSettings?.name,
+            nodeMetadataByUrl: subNameByUrl,
             userAgent,
             config
         });
