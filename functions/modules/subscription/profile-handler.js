@@ -3,6 +3,7 @@ import { createJsonResponse } from '../utils.js';
 import { parseNodeInfo } from '../utils/geo-utils.js';
 import { calculateProtocolStats, calculateRegionStats } from '../utils/node-parser.js';
 import { applyNodeTransformPipeline } from '../../utils/node-transformer.js';
+import { buildNodeMetadataByUrl } from '../../utils/node-utils.js';
 import { runOperatorChain } from '../../utils/operator-runner.js';
 import { KV_KEY_SUBS, KV_KEY_PROFILES, KV_KEY_SETTINGS, DEFAULT_SETTINGS } from '../config.js';
 import { fetchSubscriptionNodes } from './node-fetcher.js';
@@ -170,7 +171,8 @@ export async function handleProfileMode(request, env, profileId, userAgent, appl
     const allNodes = [];
     allResults.forEach(result => {
         if (result.success) {
-            allNodes.push(...result.nodes);
+            // 给每个节点注入来源订阅名，供操作符链的 {sub} 变量使用
+            allNodes.push(...result.nodes.map(node => ({ ...node, subscriptionName: result.subscriptionName || '' })));
         }
     });
 
@@ -183,7 +185,7 @@ export async function handleProfileMode(request, env, profileId, userAgent, appl
 
     if (applyTransform) {
         const nodeUrls = allNodes.map(node => node.url);
-        const nodeMetadataByUrl = new Map(allNodes.map(node => [node.url, { group: node.group || '' }]));
+        const nodeMetadataByUrl = buildNodeMetadataByUrl(allNodes);
 
         let activeOperators = ensureArray(profile?.operators);
         if (!activeOperators.length && profile?.nodeTransform?.enabled && profile.nodeTransform?.operators) {
