@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addFlagEmoji, prependNodeName } from '../../functions/utils/node-utils.js';
+import { addFlagEmoji, prependNodeName, removeFlagEmoji, indexSubNameByUrl, buildNodeMetadataByUrl } from '../../functions/utils/node-utils.js';
 import { convertClashProxyToUrl } from '../../functions/utils/clash-to-url.js';
 import { urlsToClashProxies } from '../../functions/utils/url-to-clash.js';
 
@@ -48,6 +48,34 @@ describe('node-utils', () => {
         expect(proxies).toHaveLength(1);
         expect(proxies[0].type).toBe('ssr');
         expect(proxies[0].name).toContain('台湾 1');
+    });
+
+    it('indexSubNameByUrl 同时记录原始 URL 与去 emoji 后的形态', () => {
+        const withEmoji = `ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#${encodeURIComponent('🇭🇰HKNode')}`;
+        const index = new Map();
+        indexSubNameByUrl([withEmoji], '机场A', index);
+
+        const stripped = removeFlagEmoji(withEmoji);
+        expect(stripped).not.toBe(withEmoji);
+        expect(index.get(withEmoji)).toBe('机场A');
+        expect(index.get(stripped)).toBe('机场A');
+    });
+
+    it('indexSubNameByUrl 普通 URL 只记录原始形态', () => {
+        const url = 'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode';
+        const index = new Map();
+        indexSubNameByUrl([url], '机场B', index);
+
+        expect(index.get(url)).toBe('机场B');
+    });
+
+    it('buildNodeMetadataByUrl 提取自定义分组与来源订阅名', () => {
+        const url = 'ss://YWVzLTEyOC1nY206cGFzcw@example.com:8388#HKNode';
+        const metadata = buildNodeMetadataByUrl([
+            { url, group: '香港组', subscriptionName: '机场C' }
+        ]);
+
+        expect(metadata.get(url)).toEqual({ group: '香港组', subName: '机场C' });
     });
 
     it('TUIC 节点密码包含 URL 保留字符时应保持可回环解析', () => {

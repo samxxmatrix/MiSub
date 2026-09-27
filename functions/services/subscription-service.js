@@ -7,7 +7,7 @@ import { parseNodeList } from '../modules/utils/node-parser.js';
 import { parseNodeInfo } from '../modules/utils/geo-utils.js';
 import { getProcessedUserAgent } from '../utils/format-utils.js';
 import { buildFetchProxyUrl } from '../utils/fetch-proxy-utils.js';
-import { prependNodeName, addFlagEmoji, removeFlagEmoji, fixNodeUrlEncoding, sanitizeNodeForYaml } from '../utils/node-utils.js';
+import { prependNodeName, addFlagEmoji, removeFlagEmoji, fixNodeUrlEncoding, sanitizeNodeForYaml, indexSubNameByUrl } from '../utils/node-utils.js';
 import { runOperatorChain } from '../utils/operator-runner.js';
 import { createTimeoutFetch } from '../modules/utils.js';
 import { assertPublicNetworkUrl } from '../modules/security-utils.js';
@@ -523,8 +523,8 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
             const finalNodes = (shouldAddSubPrefix && sub.name)
                 ? validNodes.map(node => prependNodeName(node, sub.name))
                 : validNodes;
-            // 记录最终节点 URL 的来源订阅名（含前缀后的最终形态，保证与汇聚后的行一致）
-            finalNodes.forEach(nodeUrl => subNameByUrl.set(nodeUrl, sub.name || ''));
+            // 记录最终节点 URL 的来源订阅名（含去 emoji 形态，保证与汇聚后的行一致）
+            indexSubNameByUrl(finalNodes, sub.name || '', subNameByUrl);
             return finalNodes.join('\n');
         } catch (e) {
             recordEmptyRuntimeInfo();

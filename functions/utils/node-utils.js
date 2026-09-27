@@ -254,6 +254,33 @@ export function removeFlagEmoji(link) {
 }
 
 /**
+ * 将节点的来源订阅名按 URL 建立索引（同时记录去国旗 emoji 后的形态，
+ * 因为外层在 emoji 关闭时会移除国旗 emoji，URL 会变化，需保证汇聚后仍能匹配）
+ * @param {string[]} nodeUrls - 最终节点 URL 列表
+ * @param {string} subName - 来源订阅名
+ * @param {Map<string, string>} index - URL -> 订阅名 索引
+ */
+export function indexSubNameByUrl(nodeUrls, subName, index) {
+    for (const nodeUrl of nodeUrls) {
+        index.set(nodeUrl, subName);
+        const strippedUrl = removeFlagEmoji(nodeUrl);
+        if (strippedUrl !== nodeUrl) index.set(strippedUrl, subName);
+    }
+}
+
+/**
+ * 构建节点元数据索引：URL -> { group, subName }，供操作符链按节点取用
+ * @param {Array<{url: string, group?: string, subscriptionName?: string}>} nodes - 带来源信息的节点列表
+ * @returns {Map<string, {group: string, subName: string}>} URL -> 元数据 索引
+ */
+export function buildNodeMetadataByUrl(nodes) {
+    return new Map(nodes.map(node => [node.url, {
+        group: node.group || '',
+        subName: node.subscriptionName || ''
+    }]));
+}
+
+/**
  * [核心修复] 修复节点URL中的编码问题（包含 Hysteria2 密码解码）
  */
 export function fixNodeUrlEncoding(nodeUrl, options = {}) {
