@@ -221,7 +221,7 @@ const copyToClipboard = async (text) => {
         </p>
       </div>
 
-      <div v-if="!isSelectionMode" class="shrink-0 flex items-center gap-1 opacity-100 transition-opacity duration-200 group-hover:opacity-100 lg:opacity-0">
+      <div v-if="!isSelectionMode" class="shrink-0 flex items-center gap-1 transition-opacity duration-200">
         <button 
           @click.stop="emit('ping')" 
           class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:bg-green-500/10 hover:text-green-500 lg:min-h-0 lg:min-w-0" 

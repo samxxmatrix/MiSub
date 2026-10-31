@@ -126,7 +126,7 @@ const protocolStyle = computed(() => {
       </div>
     </div>
 
-    <div v-if="!isSelectionMode" class="shrink-0 flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+    <div v-if="!isSelectionMode" class="shrink-0 flex items-center gap-1 transition-opacity duration-200">
         <button @click.stop="emit('ping')" class="rounded-md p-2 text-gray-400 transition-colors hover:bg-green-500/10 hover:text-green-500" :title="t('actions.ping')" :disabled="isPinging" :class="{ 'animate-pulse text-green-500': isPinging }">
            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
         </button>
