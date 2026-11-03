@@ -103,3 +103,16 @@ docker/
 data/
 /brain/
 /scratch/
+
+# 过程资产不入库，存于 D:/WorkBuddy/_private/MiSub/
+docs/plans/
+docs/specs/
+docs/superpowers/
+docs/workbuddy_plan/
+test-reports/
+.claude/
+.workbuddy/
+.cursor/
+AGENTS.md
+CLAUDE.md
+tools/oneoff/
